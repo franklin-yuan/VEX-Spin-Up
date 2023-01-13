@@ -7,8 +7,8 @@
 #define RIGHT_ENCODER_TOP 'C'
 #define RIGHT_ENCODER_BOTTOM 'D'
 
-#define BACK_ENCODER_TOP 'E'
-#define BACK_ENCODER_BOTTOM 'F'
+#define SIDE_ENCODER_TOP 'E'
+#define SIDE_ENCODER_BOTTOM 'F'
 
 #define ODOM_WHEEL_DIAMETER_CM 7.06882 //cm
 
@@ -22,7 +22,7 @@ namespace odom{
     double x, y, theta;
     double leftL, rightL, sideL, gyroL;
 
-    void updatePos(float left, float right, float back);
+    void updatePos(float left, float right, float side, float gyro);
     void printPos();
     void resetEncoders();
     void printEncoders();

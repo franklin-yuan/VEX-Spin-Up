@@ -2,7 +2,7 @@
 
 pros::ADIEncoder leftEncoder (LEFT_ENCODER_TOP, LEFT_ENCODER_BOTTOM, true);
 pros::ADIEncoder rightEncoder (RIGHT_ENCODER_TOP, RIGHT_ENCODER_BOTTOM, false);
-pros::ADIEncoder backEncoder (BACK_ENCODER_TOP, BACK_ENCODER_BOTTOM, true);
+pros::ADIEncoder sideEncoder (SIDE_ENCODER_TOP, SIDE_ENCODER_BOTTOM, true);
 
 void odom::updatePos(float left, float right, float side, float gyro){
     float dL = (left - odom::leftL) * DEGREES_TO_CM;
@@ -50,10 +50,10 @@ void odom::updatePos(float left, float right, float side, float gyro){
 void runOdomTracking(){
     float left = leftEncoder.get_value();
     float right = rightEncoder.get_value();
-    float back = backEncoder.get_value();
+    float side = sideEncoder.get_value();
 
     double inertial = degToRad(constrainAngle(gyro.get_heading()));
-    odom::updatePos(left, right, back, inertial);
+    odom::updatePos(left, right, side, inertial);
     pros::delay(20);
 }
 
@@ -63,13 +63,13 @@ void odom::printPos(){
 }
 
 void odom::resetEncoders(){
-    leftEncoder.reset(); rightEncoder.reset(); backEncoder.reset();
+    leftEncoder.reset(); rightEncoder.reset(); sideEncoder.reset();
 }
 
 void odom::printEncoders(){
     double left = leftEncoder.get_value(); 
     double right = rightEncoder.get_value();
-    double back = backEncoder.get_value();
-    pros::lcd::print(2,"(%f,%f,%f)", left,right,back);
-    std::cout << "Left: " << left << "Right: " << right << "Back: " << back << std::endl;
+    double side = sideEncoder.get_value();
+    pros::lcd::print(2,"(%f,%f,%f)", left,right,side);
+    std::cout << "Left: " << left << "Right: " << right << "side: " << side << std::endl;
 }

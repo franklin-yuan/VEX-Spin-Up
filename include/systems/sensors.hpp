@@ -1,4 +1,4 @@
 #pragma once
 #include "main.h"
 
-pros::Imu gyro;
+extern pros::Imu gyro;
