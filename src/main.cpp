@@ -62,6 +62,7 @@ void autonomous() {}
  */
 void opcontrol() {
     pros::Task catapultTask(catapult);
+    pros::Task odomTask(runOdomTracking);
     while (true) {
         // opDrive();
         odom::printEncoders();

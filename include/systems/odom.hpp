@@ -10,15 +10,16 @@
 #define SIDE_ENCODER_TOP 'G'
 #define SIDE_ENCODER_BOTTOM 'H'
 
-#define ODOM_WHEEL_DIAMETER_CM 7.06882 //cm
+#define ODOM_WHEEL_DIAMETER_CM 7.06882  // cm
 
 #define DEGREES_TO_CM (ODOM_WHEEL_DIAMETER_CM * pi / 360)
 
-namespace odom{
-    void updatePos(float left, float right, float side, float gyro);
-    void printPos();
-    void resetEncoders();
-    void printEncoders();
-}
+namespace odom {
+void updatePosPilons(float left, float right, float side, float gyro);
+void updatePos(float left, float right, float side, float gyro);
+void printPos();
+void resetEncoders();
+void printEncoders();
+}  // namespace odom
 
 extern void runOdomTracking();
