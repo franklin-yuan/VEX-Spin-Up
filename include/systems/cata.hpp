@@ -1,4 +1,4 @@
 #pragma once
 #include "main.h"
 
-extern void resetCataFn();
+extern void catapult();

@@ -7,12 +7,13 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-	gyro.reset();
-	while (gyro.is_calibrating()){ pros::delay(20); }
-	odom::resetEncoders();
-	pros::Task trackOdom (runOdomTracking);
-	//pros::Task resetCata (resetCataFn);
+    pros::lcd::initialize();
+    gyro.reset();
+    while (gyro.is_calibrating()) {
+        pros::delay(20);
+    }
+    odom::resetEncoders();
+    // pros::Task trackOdom (runOdomTracking);
 }
 
 /**
@@ -60,12 +61,11 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	
-	while(true){
-		//opDrive();
-		odom::printEncoders();
-		odom::printPos();
-		pros::delay(20);
-	}
+    pros::Task catapultTask(catapult);
+    while (true) {
+        // opDrive();
+        odom::printEncoders();
+        odom::printPos();
+        pros::delay(20);
+    }
 }
-

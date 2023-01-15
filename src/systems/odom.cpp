@@ -79,7 +79,6 @@ void odom::printEncoders(){
 }
 
 void runOdomTracking(){
-
     while (true){
         float left = leftEncoder.get_value();
         float right = rightEncoder.get_value();
