@@ -11,9 +11,8 @@ void initialize() {
 	gyro.reset();
 	while (gyro.is_calibrating()){ pros::delay(20); }
 	odom::resetEncoders();
-	
 	pros::Task trackOdom (runOdomTracking);
-	pros::Task resetCata (resetCataFn);
+	//pros::Task resetCata (resetCataFn);
 }
 
 /**
@@ -61,8 +60,11 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	
 	while(true){
-		opDrive();
+		//opDrive();
+		odom::printEncoders();
+		odom::printPos();
 		pros::delay(20);
 	}
 }

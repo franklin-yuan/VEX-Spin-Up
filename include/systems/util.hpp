@@ -1,6 +1,6 @@
 #pragma once
 #include "main.h"
 
-double constrainAngle(double angle);
-double degToRad(double x);
-double radToDeg(double x);
+extern double constrainAngle(double angle);
+extern double degToRad(double x);
+extern double radToDeg(double x);

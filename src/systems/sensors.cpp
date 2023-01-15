@@ -1,3 +1,3 @@
 #include "main.h"
 
-pros::Imu gyro(20);
+pros::Imu gyro(7);

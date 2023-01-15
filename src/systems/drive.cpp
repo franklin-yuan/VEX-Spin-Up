@@ -2,8 +2,8 @@
 
 Controller controller;
 
-MotorGroup Ldrive({1,2,3});
-MotorGroup Rdrive({4,5,6});
+MotorGroup Ldrive({-1,-2,3});
+MotorGroup Rdrive({4,5,-6});
 
 
 std::shared_ptr<okapi::ChassisController> chassisController = ChassisControllerBuilder()
@@ -16,6 +16,6 @@ std::shared_ptr<okapi::ChassisModel> chassis = chassisController->getModel();
 void opDrive(){
     float leftY = controller.getAnalog(ControllerAnalog::leftY);
     float rightX = controller.getAnalog(ControllerAnalog::rightX);
-    chassis->arcade(leftY,rightX);
+    chassis->arcade(leftY,rightX); //reverse rightY cause weird reversal stuff, easy fix
 }
 

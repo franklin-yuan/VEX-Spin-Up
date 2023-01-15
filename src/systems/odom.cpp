@@ -1,30 +1,44 @@
 #include "main.h"
 
-pros::ADIEncoder leftEncoder (LEFT_ENCODER_TOP, LEFT_ENCODER_BOTTOM, true);
-pros::ADIEncoder rightEncoder (RIGHT_ENCODER_TOP, RIGHT_ENCODER_BOTTOM, false);
+pros::ADIEncoder leftEncoder ({6 ,LEFT_ENCODER_TOP, LEFT_ENCODER_BOTTOM}, true);
+pros::ADIEncoder rightEncoder ({6 , RIGHT_ENCODER_TOP, RIGHT_ENCODER_BOTTOM}, true);
 pros::ADIEncoder sideEncoder (SIDE_ENCODER_TOP, SIDE_ENCODER_BOTTOM, true);
 
-void odom::updatePos(float left, float right, float side, float gyro){
-    float dL = (left - odom::leftL) * DEGREES_TO_CM;
-    float dR = (right - odom::rightL) * DEGREES_TO_CM;
-    float dS = (side - odom::sideL) * DEGREES_TO_CM;
+namespace odom{
+    static float d1 = 18.75; //left to center, cm
+    static float d2 = 18.75; //right to center, cm
+    static float d3 = 17; //back to center, cm
 
-    odom::leftL = left;
-    odom::rightL = right;
-    odom::sideL = side;
+    double x, y, theta;
+    double leftL, rightL, sideL, gyroL;
+
+    void updatePos(float left, float right, float side, float gyro);
+    void printPos();
+    void resetEncoders();
+    void printEncoders();
+}
+
+void odom::updatePos(float left, float right, float side, float gyro){
+    float dL = (left - leftL) * DEGREES_TO_CM;
+    float dR = (right - rightL) * DEGREES_TO_CM;
+    float dS = (side - sideL) * DEGREES_TO_CM;
+
+    leftL = left;
+    rightL = right;
+    sideL = side;
 
     float hyp, hypS, r, rS, dTheta, dThetaGyro;
 
     dThetaGyro = gyro - gyroL;
-    dTheta = (dL - dR) / (odom::d1 + odom::d2); //radians
+    dTheta = (dL - dR) / (d1 + d2); //radians
     dTheta = (dTheta + dThetaGyro) / 2; //average gyro and encoder readings
 
     if (dTheta != 0){
         r = dR / dTheta; //radius of arc by right side enc
-        hyp = ((r + odom::d2) * sin(dTheta / 2.0)) * 2.0;
+        hyp = ((r + d2) * sin(dTheta / 2.0)) * 2.0;
 
         rS = dS / dTheta;
-        hypS = ((rS + odom::d3) * sin(dTheta / 2.0)) * 2.0;
+        hypS = ((rS + d3) * sin(dTheta / 2.0)) * 2.0;
 
     }
     else{
@@ -36,30 +50,20 @@ void odom::updatePos(float left, float right, float side, float gyro){
 
     }
 
-    double newHeading = dTheta + odom::theta;
+    double newHeading = dTheta + theta;
 
     double dX = sin(newHeading) * hyp;
     double dY = cos(newHeading) * hyp;
 
-    odom::x += dX;
-    odom::y += dY;
-    odom::theta = newHeading;
-    odom::gyroL = gyro;
-}
-
-void runOdomTracking(){
-    float left = leftEncoder.get_value();
-    float right = rightEncoder.get_value();
-    float side = sideEncoder.get_value();
-
-    double inertial = degToRad(constrainAngle(gyro.get_heading()));
-    odom::updatePos(left, right, side, inertial);
-    pros::delay(20);
+    x += dX;
+    y += dY;
+    theta = newHeading;
+    gyroL = gyro;
 }
 
 void odom::printPos(){
-    std::cout << "(" << odom::x << "," << odom::y << "," << odom::theta << ")" << std::endl;
-    pros::lcd::print(1,"(%f,%f,%f degrees)",odom::x,odom::y,odom::theta);
+    std::cout << "(" << x << "," << y << "," << theta << ")" << std::endl;
+    pros::lcd::print(1,"(%f,%f,%f degrees)",x,y,theta);
 }
 
 void odom::resetEncoders(){
@@ -72,4 +76,18 @@ void odom::printEncoders(){
     double side = sideEncoder.get_value();
     pros::lcd::print(2,"(%f,%f,%f)", left,right,side);
     std::cout << "Left: " << left << "Right: " << right << "side: " << side << std::endl;
+}
+
+void runOdomTracking(){
+
+    while (true){
+        float left = leftEncoder.get_value();
+        float right = rightEncoder.get_value();
+        float side = sideEncoder.get_value();
+
+        double inertial = degToRad(constrainAngle(gyro.get_heading()));
+        odom::updatePos(left, right, side, inertial);
+        std::cout << "oooooo" << std::endl;
+        pros::delay(50);
+    }
 }
