@@ -8,8 +8,9 @@
  */
 void initialize() {
     pros::lcd::initialize();
-    gyro.reset();
-    while (gyro.is_calibrating()) {
+    gyro1.reset();
+    gyro2.reset();
+    while (gyro1.is_calibrating() || gyro2.is_calibrating()) {
         pros::delay(20);
     }
     odom::resetEncoders();
@@ -63,9 +64,9 @@ void autonomous() {}
 void opcontrol() {
     pros::Task catapultTask(catapult);
     pros::Task odomTask(runOdomTracking);
+    odom::resetEncoders();
     while (true) {
         // opDrive();
-        odom::printEncoders();
         odom::printPos();
         pros::delay(20);
     }

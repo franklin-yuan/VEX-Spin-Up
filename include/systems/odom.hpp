@@ -20,6 +20,7 @@ void updatePos(float left, float right, float side, float gyro);
 void printPos();
 void resetEncoders();
 void printEncoders();
+void ramseteManual(double xd, double yd, double thetad);
 }  // namespace odom
 
 extern void runOdomTracking();
