@@ -65,9 +65,10 @@ void opcontrol() {
     pros::Task catapultTask(catapult);
     pros::Task odomTask(runOdomTracking);
     odom::resetEncoders();
-    while (true) {
-        // opDrive();
-        odom::printPos();
-        pros::delay(20);
-    }
+    
+    // while (true) {
+    //     // opDrive();
+    //     odom::printPos();
+    //     pros::delay(20);
+    // }
 }
