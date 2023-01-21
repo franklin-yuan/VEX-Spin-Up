@@ -1,6 +1,6 @@
 #include "main.h"
 #define LIMIT_SWITCH 'A'
-#define CATA_PORT 1
+#define CATA_PORT 18
 
 Motor cata(CATA_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::counts);
 pros::ADIDigitalIn limitSwitch(LIMIT_SWITCH);

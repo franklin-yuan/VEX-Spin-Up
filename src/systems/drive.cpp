@@ -2,8 +2,8 @@
 
 Controller controller;
 
-MotorGroup Ldrive({-1,-2,3});
-MotorGroup Rdrive({4,5,-6});
+MotorGroup Ldrive({-14,-16,17});
+MotorGroup Rdrive({11,12,-13});
 
 
 std::shared_ptr<okapi::ChassisController> chassisController = ChassisControllerBuilder()

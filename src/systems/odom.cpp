@@ -1,7 +1,7 @@
 #include "main.h"
 
-pros::ADIEncoder leftEncoder({6, LEFT_ENCODER_TOP, LEFT_ENCODER_BOTTOM}, true);
-pros::ADIEncoder rightEncoder({6, RIGHT_ENCODER_TOP, RIGHT_ENCODER_BOTTOM}, true);
+pros::ADIEncoder leftEncoder({ADIEXPANDER, LEFT_ENCODER_TOP, LEFT_ENCODER_BOTTOM}, true);
+pros::ADIEncoder rightEncoder({ADIEXPANDER, RIGHT_ENCODER_TOP, RIGHT_ENCODER_BOTTOM}, true);
 pros::ADIEncoder sideEncoder(SIDE_ENCODER_TOP, SIDE_ENCODER_BOTTOM, true);
 
 namespace odom {
@@ -16,7 +16,7 @@ namespace odom {
     void printPos();
     void resetEncoders();
     void printEncoders();
-    void ramseteManual(double xd, double yd, double thetad);
+    void ramseteManual(double xd, double yd, double thetad, double vd, float b, float z);
 }  
 
 //pilons math, doesnt work
@@ -101,17 +101,27 @@ void odom::updatePos(float left, float right, float side, float gyro) {
     //add dtheta and also average with gyro vals
 }
 
-void odom::ramseteManual(double xd, double yd, double thetad){
+void odom::ramseteManual(double xd, double yd, double thetad, double vd, float b, float z){
 
-    float threshold = 0.5;
+    thetad = degToRad(thetad);
+
+    //change input degrees to radians
+
+    float threshold = 20;
     //how far from target to move on
 
     double dis = distanceToPoint({x,y},{xd,yd});
 
     while (dis > threshold){
 
+        dis = distanceToPoint({x,y},{xd,yd});
+
+        std::cout << dis << std::endl;
+
         double xe_g, ye_g, thetae_g; //global error
-        xe_g = xd - x; ye_g = yd - y; thetae_g = thetad - theta;
+        xe_g = xd - x; ye_g = yd - y; thetae_g = thetad - theta;   
+
+        //std::cout << xe_g << ye_g << thetae_g << std::endl;
 
         double xe_l, ye_l, thetae_l; //local error
         
@@ -123,12 +133,15 @@ void odom::ramseteManual(double xd, double yd, double thetad){
         // where x is forwards/backwards
 
         float beta, zeta;
-        double vd, omegad;
+        double omegad;
         
         double omegaMax = 100;
         double vMax = 100;
 
         float k;
+
+        beta = b;
+        zeta = z;
         //where beta > 0, and controls sensitivity
         // 0 < zeta < 1, dampens sensitivity
         // vd is the desired linear velocity
@@ -140,17 +153,18 @@ void odom::ramseteManual(double xd, double yd, double thetad){
 
         //for non-profiled movements, automatic estimation of vd and omegad
 
-        vd = scalar * xe_l;
-        omegad = scalar * thetae_l;
+        omegad = 0;
 
         k = 2 * zeta * pow(pow(omegad, 2) + beta * pow(vd, 2), 0.5);
 
         double v, omega;
 
+        std::cout << vd << " " << omega << std::endl;
+
         //where v and omega are output linear and angular velocities
 
         //apply gain to generate output v and omega
-        v = vd * cos(thetae_l + k * xe_l);
+        v = vd * cos(thetae_l) + k * xe_l;
 
         if (thetae_l != 0) {
             omega = omegad + k * thetae_l + (beta * vd * sin(thetae_l) * ye_l) / thetae_l;
@@ -159,22 +173,30 @@ void odom::ramseteManual(double xd, double yd, double thetad){
             omega = omegaMax;
         }
 
-        //convert v and omega to left and right drive vals
-
         double v_motor, omega_motor;
 
         double left, right;
         //where v_motor is the linear velocity component of motor val, etc.
         //left and right are respective drive train vals
 
+        v_motor = v / DRIVE_WHEEL_DIAMETER_CM;
+
+        omega_motor = omega; //this line is questionable, research more
+
+        float motor_k_v = 1.7;
+        float motor_k_omega = 0.1;
+
+        float motor_k = 1;
+
+        v_motor *= motor_k_v;
+        omega_motor *= motor_k_omega;
+        //apply scaling value
+
         left = v_motor + omega_motor;
         right = v_motor - omega_motor;
 
-        float k = 300;
-        
-        left *= k; right *= k;
-
-        //apply scaling value
+        left *= motor_k; right *= motor_k;
+        //convert v and omega to left and right drive vals
 
         Ldrive.moveVoltage(left);
         Rdrive.moveVoltage(right);
@@ -183,6 +205,7 @@ void odom::ramseteManual(double xd, double yd, double thetad){
 
         pros::delay(10);
     }
+
 }
 
 void odom::printPos() {
@@ -210,9 +233,10 @@ void runOdomTracking() {
         float right = rightEncoder.get_value();
         float side = sideEncoder.get_value();
 
-        double inertial = degToRad(constrainAngle((gyro1.get_heading() + gyro2.get_heading()) / 2)); //average two gyros
+        //double inertial = constrainAngle((gyro1.get_heading() + gyro2.get_heading()) / 2); //average two gyros
+        double inertial = constrainAngle(gyro2.get_heading()); //average two gyros
         odom::updatePos(left, right, side, inertial);
-        std::cout << "oooooo" << std::endl;
-        pros::delay(50);
+        odom::printPos();
+        pros::delay(30);
     }
 }
