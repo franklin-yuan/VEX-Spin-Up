@@ -65,44 +65,18 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    pros::Task catapultTask(catapult);
+    //pros::Task catapultTask(catapult);
     pros::Task odomTask(runOdomTracking);
     
-    // odom::ramseteManual(5, -5, -20, 400, 2, 0.7);
-    // std::cout << "1" << std::endl;
-    // odom::ramseteManual(10, -10, -45, 400, 2, 0.7);
-    // std::cout << "2" << std::endl;
-    // odom::ramseteManual(15, -15, -45, 400, 2, 0.7);
-    // std::cout << "3" << std::endl;
-    // odom::ramseteManual(20, -25, -45, 400, 2, 0.7);
-    // std::cout << "4" << std::endl;
-    // odom::ramseteManual(25, -25, -45, 400, 2, 0.7);
-    // std::cout << "5" << std::endl;
-    // odom::ramseteManual(30, -30, -45, 400, 2, 0.7);
-    // std::cout << "6" << std::endl;
-    // odom::ramseteManual(25, -35, -45, 400, 2, 0.7);
-    // std::cout << "7" << std::endl;
-    // odom::ramseteManual(40, -40, -45, 400, 2, 0.7);
-    // std::cout << "8" << std::endl;
-    // odom::ramseteManual(45, -45, -45, 400, 2, 0.7);
-    // std::cout << "9" << std::endl;
-    // odom::ramseteManual(50, -50, -45, 400, 2, 0.7);
-    // std::cout << "10" << std::endl;
-    // odom::ramseteManual(55, -55, -45, 400, 2, 0.7);
-    // std::cout << "11" << std::endl;
-    // odom::ramseteManual(60, -60, -45, 400, 2, 0.7);
-    // std::cout << "12" << std::endl;
-    // odom::ramseteManual(65, -65, -45, 400, 2, 0.7);
-    // std::cout << "13" << std::endl;
-    // odom::ramseteManual(70, -70, -45, 400, 2, 0.7);
-    // std::cout << "14" << std::endl;
-    // odom::ramseteManual(75, -75, -45, 400, 2, 0.7);
-    // std::cout << "15" << std::endl;
-    // odom::ramseteManual(80, -80, -45, 400, 2, 0.7);
-    // std::cout << "16" << std::endl;
-    while (true) {
-        opDrive();
-        odom::printPos();
-        pros::delay(20);
+    for (int i = 1; i < path.size(); i++){
+        std::cout << path[i][0] << path[i][1] << path[i][2] << path[i][3] << std::endl;
+
+        odom::ramseteManual(path[i][0], path[i][1], 0, path[i][2], path[i][3], 2, 0.7);
     }
+
+    // while (true) {
+    //     opDrive();
+    //     odom::printPos();
+    //     pros::delay(20);
+    // }
 }

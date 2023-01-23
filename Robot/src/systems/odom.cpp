@@ -4,6 +4,8 @@ pros::ADIEncoder leftEncoder({ADIEXPANDER, LEFT_ENCODER_TOP, LEFT_ENCODER_BOTTOM
 pros::ADIEncoder rightEncoder({ADIEXPANDER, RIGHT_ENCODER_TOP, RIGHT_ENCODER_BOTTOM}, true);
 pros::ADIEncoder sideEncoder(SIDE_ENCODER_TOP, SIDE_ENCODER_BOTTOM, true);
 
+std::vector<std::vector<double>>* path_ptr = &path;
+
 namespace odom {
     const float d1 = 7.5;  // left to center, cm
     const float d2 = 7.5;  // right to center, cm
@@ -16,7 +18,8 @@ namespace odom {
     void printPos();
     void resetEncoders();
     void printEncoders();
-    void ramseteManual(double xd, double yd, double thetad, double vd, float b, float z);
+    void ramseteManual(double xd, double yd, double thetad, double omegad, double vd, float b, float z);
+    void readFile();
 }  
 
 //pilons math, doesnt work
@@ -101,7 +104,28 @@ void odom::updatePos(float left, float right, float side, float gyro) {
     //add dtheta and also average with gyro vals
 }
 
-void odom::ramseteManual(double xd, double yd, double thetad, double vd, float b, float z){
+void odom::readFile(){
+    using namespace std;
+    std::fstream file;
+    file.open("pyscripts/paths/path.txt", std::ios::in);
+
+    std::string out;
+    vector<double> values;
+    while(getline(file, out)){
+        char arr[out.length() + 1];
+        strcpy(arr, out.c_str()); 
+        char *ptr; // declare a ptr pointer  
+        ptr = strtok(arr, " ");
+        while (ptr != NULL)  {
+            values.push_back(stod(ptr));
+            ptr = strtok (NULL, " , ");  
+        }
+    }
+    printf("%f", values.at(1));
+
+}
+
+void odom::ramseteManual(double xd, double yd, double thetad, double vd, double omegad, float b, float z){
 
     thetad = degToRad(thetad);
 
@@ -133,7 +157,6 @@ void odom::ramseteManual(double xd, double yd, double thetad, double vd, float b
         // where x is forwards/backwards
 
         float beta, zeta;
-        double omegad;
         
         double omegaMax = 100;
         double vMax = 100;
@@ -152,8 +175,6 @@ void odom::ramseteManual(double xd, double yd, double thetad, double vd, float b
         float scalar = 0.01; 
 
         //for non-profiled movements, automatic estimation of vd and omegad
-
-        omegad = 0;
 
         k = 2 * zeta * pow(pow(omegad, 2) + beta * pow(vd, 2), 0.5);
 
@@ -186,7 +207,7 @@ void odom::ramseteManual(double xd, double yd, double thetad, double vd, float b
         float motor_k_v = 1.7;
         float motor_k_omega = 0.1;
 
-        float motor_k = 1;
+        float motor_k = 15;
 
         v_motor *= motor_k_v;
         omega_motor *= motor_k_omega;
@@ -239,4 +260,8 @@ void runOdomTracking() {
         odom::printPos();
         pros::delay(30);
     }
+}
+
+int main(){
+    odom::readFile();
 }

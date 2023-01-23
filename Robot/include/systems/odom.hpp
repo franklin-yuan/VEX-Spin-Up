@@ -1,5 +1,9 @@
 #pragma once
 #include "main.h"
+#include <fstream>
+#include <iostream>
+#include <string>
+
 
 #define LEFT_ENCODER_TOP 'A'
 #define LEFT_ENCODER_BOTTOM 'B'
@@ -23,7 +27,10 @@ void updatePos(float left, float right, float side, float gyro);
 void printPos();
 void resetEncoders();
 void printEncoders();
-void ramseteManual(double xd, double yd, double thetad, double vd, float b, float z);
+void ramseteManual(double xd, double yd, double thetad, double vd, double omegad, float b, float z);
+void readFile();
 }  // namespace odom
 
 extern void runOdomTracking();
+extern std::vector<std::vector<double>> path;
+extern std::vector<std::vector<double>>* path_ptr;
