@@ -20,7 +20,7 @@ namespace odom {
     void printEncoders();
     void ramseteManual(double xd, double yd, double thetad, double omegad, double vd, float b, float z);
     void readFile();
-}  
+}
 
 //pilons math, doesnt work
 

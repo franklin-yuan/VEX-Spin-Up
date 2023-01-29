@@ -68,11 +68,18 @@ void opcontrol() {
     //pros::Task catapultTask(catapult);
     pros::Task odomTask(runOdomTracking);
     
-    for (int i = 1; i < path.size(); i++){
-        std::cout << path[i][0] << path[i][1] << path[i][2] << path[i][3] << std::endl;
+    // for (int i = 1; i < path.size(); i++){
+    //     std::cout << path[i][0] << path[i][1] << path[i][2] << path[i][3] << std::endl;
 
-        odom::ramseteManual(path[i][0], path[i][1], 0, path[i][2], path[i][3], 2, 0.7);
-    }
+    //     odom::ramseteManual(path[i][0], path[i][1], 0, path[i][2], path[i][3], 2, 0.7);
+    // }
+
+    // pidTurn(90, 2.4, 2, 0);
+    // pidTurn(0, 2.4, 2, 0);
+    // pidTurn(180, 2.4, 2, 0);
+    // pidTurn(-180, 2.4, 2, 0);
+
+    pidDrive(100);
 
     // while (true) {
     //     opDrive();

@@ -22,6 +22,7 @@
 #define ADIEXPANDER 20
 
 namespace odom {
+
 void updatePosPilons(float left, float right, float side, float gyro);
 void updatePos(float left, float right, float side, float gyro);
 void printPos();
@@ -29,8 +30,14 @@ void resetEncoders();
 void printEncoders();
 void ramseteManual(double xd, double yd, double thetad, double vd, double omegad, float b, float z);
 void readFile();
+
+extern double theta;
 }  // namespace odom
 
 extern void runOdomTracking();
 extern std::vector<std::vector<double>> path;
 extern std::vector<std::vector<double>>* path_ptr;
+
+extern pros::ADIEncoder leftEncoder;
+extern pros::ADIEncoder rightEncoder;
+extern pros::ADIEncoder sideEncoder;
