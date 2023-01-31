@@ -1,4 +1,9 @@
 #include "main.h"
+int sgn(double x) {
+    if (x > 0){return 1;}
+    else if (x < 0){return -1;}
+    else {return 0;}
+}
 
 double constrainAngle(double angle) {
     return atan2(sin(angle * pi / 180), cos(angle * pi / 180)) * 180 / pi;
