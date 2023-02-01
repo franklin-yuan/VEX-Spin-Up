@@ -71,6 +71,12 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "condition_variable": "cpp",
+        "cwctype": "cpp",
+        "deque": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "string_view": "cpp"
     }
 }
