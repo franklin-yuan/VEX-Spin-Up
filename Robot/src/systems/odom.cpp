@@ -257,7 +257,7 @@ void runOdomTracking() {
         //double inertial = constrainAngle((gyro1.get_heading() + gyro2.get_heading()) / 2); //average two gyros
         double inertial = constrainAngle(gyro2.get_heading()); //average two gyros
         odom::updatePos(left, right, side, inertial);
-        odom::printPos();
+        //odom::printPos();
         pros::delay(30);
     }
 }

@@ -31,7 +31,7 @@ void printEncoders();
 void ramseteManual(double xd, double yd, double thetad, double vd, double omegad, float b, float z);
 void readFile();
 
-extern double theta;
+extern double theta, x, y;
 }  // namespace odom
 
 extern void runOdomTracking();

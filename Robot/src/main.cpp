@@ -65,7 +65,7 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    pros::Task catapultTask(catapult);
+    // pros::Task catapultTask(catapult);
     pros::Task odomTask(runOdomTracking);
     
     // for (int i = 1; i < path.size(); i++){
@@ -79,12 +79,13 @@ void opcontrol() {
     // pidTurn(180, 2.4, 2, 0);
     // pidTurn(-180, 2.4, 2, 0);
 
-    pidDrive(100, 0);
-    setIntake(170);
-    pidTurn(180, 2.4, 2, 0);
-    pidDrive(100, 180);
-    pidTurn(0, 2.4, 2, 0);
+    // pidDrive(100, 0);
+    // setIntake(170);
+    // pidTurn(180, 2.4, 2, 0);
+    // pidDrive(100, 180);
+    // pidTurn(0, 2.4, 2, 0);
 
+    runpp(path);
 
 
     // while (true) {

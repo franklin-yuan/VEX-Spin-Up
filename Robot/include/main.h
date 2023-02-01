@@ -59,6 +59,7 @@ using namespace okapi;
 #include "systems/sensors.hpp"
 #include "systems/util.hpp"
 #include "systems/pid.hpp"
+#include "systems/pp.hpp"
 
 /**
  * Prototypes for the competition control tasks are redefined here to ensure

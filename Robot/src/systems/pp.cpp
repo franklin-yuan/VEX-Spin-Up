@@ -4,7 +4,10 @@ namespace pp
 {
     int lastIndex = 0;
     float kP = 1;
-    const float lookAhead = 1;
+    const float robotWidth = 25.4;
+    const float lookAhead = 50;
+    const float linearVel = 5000;
+    double angularVel;
 }
 
 void ppStep(std::vector<std::vector<double>> path, point currentPoint, double currentHeading, float lookAhead, int lastIndex)
@@ -20,11 +23,11 @@ void ppStep(std::vector<std::vector<double>> path, point currentPoint, double cu
 
     std::tie(x, y) = currentPoint;
 
+    printf("%f, %f", x, y);
     int startIndex = lastIndex;
 
-    for (int i = 0; i < path.size(); i++)
+    for (int i = 0; i < path.size() - 1; i++)
     {
-
         x1 = path[i][0] - x;
         y1 = path[i][1] - y;
         x2 = path[i + 1][0] - x;
@@ -114,5 +117,17 @@ void ppStep(std::vector<std::vector<double>> path, point currentPoint, double cu
         error_a = -1 * sgn(error_a) * (360 - fabs(error_a));
     }
 
-    output = pp::kP * error_a;
+    output = ((pp::robotWidth * sin(degToRad(error_a))) / pp::lookAhead) * pp::linearVel * pp::kP;
+
+    pp::angularVel = output;
+}
+
+void runpp(std::vector<std::vector<double>> path){
+    while (pp::lastIndex <= path.size() - 2){
+        ppStep(path, {odom::y, odom::x}, gyro2.get_heading(), pp::lookAhead, pp::lastIndex);
+        std::cout << pp::angularVel << ", " << pp::lastIndex << std::endl;
+        Ldrive.moveVoltage(pp::linearVel + pp::angularVel);
+        Rdrive.moveVoltage(pp::linearVel - pp::angularVel);
+        pros::delay(20);
+    }
 }
