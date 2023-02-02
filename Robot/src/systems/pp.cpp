@@ -1,22 +1,205 @@
 #include "main.h"
 
+/*
+1. Find closest point
+2. Find lookahead point
+3. Calculate curvature of arc to lookahead point
+4. Calculate target left and right wheel velocities
+*/
+
+
 namespace pp
 {
-    int lastIndex = 0;
-    float kP = 1;
+    // int lastIndex = 0;
+    // float kP = 1;
     const float robotWidth = 25.4;
-    const float lookAhead = 10;
-    const float linearVel = 5000; //voltages
-    double angularVel;
+    // const float lookAhead = 10;
+    const float linearVel = 100; //cms-1
+    // double angularVel;
 
-    double t, t_i;
+    // double t, t_i;
+
+    const float lookAhead = 10;
+
+    int lastClosestIndex = 0;
+    double lookAheadIndex = 0; //fractional index
+    point lookAheadPt;
+    double signedCurv;
 
     // void ppStep1(std::vector<std::vector<double>> path, point currentPos, double currentHeading, float lookAhead, int lastIndex);
     void runpp(std::vector<std::vector<double>> path);
-    // double closest(std::vector<std::vector<double>> path, point pos);
-    // point lookAhead_f(std::vector<std::vector<double>> path, point pos, double t, double t_i);
-    // double curvature(point lookAhead);
+    void findClosest(std::vector<std::vector<double>> path, point pos);
+    void lookAhead_f(std::vector<std::vector<double>> path, point pos);
+    void findCurvature(point pos);
+    std::pair<double, double> findMotorVel();
+
+
 }
+
+void pp::findClosest(std::vector<std::vector<double>> path, point pos)
+{
+    float x_c, y_c;
+    int lastIndex = pp::lastClosestIndex;
+    double min = distanceToPoint(pos, {path[0][0], path[0][1]});
+    double d;
+    x_c = pos.first; y_c = pos.second;
+
+    for (int i = lastIndex; i < path.size(); i++)
+    {
+        d = distanceToPoint(pos, {path[i][0], path[i][1]});
+        if (d < min){
+            pp::lastClosestIndex = i;
+        }
+    }
+}
+
+void pp::lookAhead_f(std::vector<std::vector<double>> path, point pos)
+{
+    point seg_start, seg_end;
+    point seg_direction, robot_vec;
+    point pt; 
+    double a, b, c, d, t_1, t_2;
+
+    for (int i = 0; i < path.size(); i++)
+    {
+        seg_start = {path[i][0], path[i][1]};
+        seg_start = {path[i+1][0], path[i+1][1]};
+
+        seg_direction = {seg_start.first - seg_end.first, seg_start.second - seg_end.second};
+
+        robot_vec = {seg_start.first - pos.first, seg_start.second - pos.second};
+
+        a = pow(seg_direction.first, 2.0) + pow(seg_direction.second, 2.0); //d .  d
+
+        b = 2 * (seg_direction.first * robot_vec.first + seg_direction.second * robot_vec.second); //f . d
+
+        c = pow(robot_vec.first, 2.0) + pow(robot_vec.second, 2) - pow(pp::lookAhead, 2.0); 
+
+        d = pow(b, 2) - 4 * a * c;
+
+        if (d < 0) 
+        {
+            continue;
+        }
+
+        else{
+            d = sqrt(d);
+            t_1 = (-b - d) / (2 * a);
+            t_2 = (-b + d) / (2 * a);
+
+            if (t_1 <= pp::lookAheadIndex && t_2 <= pp::lookAheadIndex){continue;}
+
+            if (t_1 >= 0 && t_1 <= 1)
+            {
+                pt = seg_start;
+                pt.first += t_1 * seg_direction.first;
+                pt.second += t_1 * seg_direction.first;
+
+                pp::lookAheadPt = pt;
+                pp::lookAheadIndex = i + t_1;
+            }
+
+            else if (t_2 >= 0 && t_2 <= 1)
+            {
+                pt = seg_start;
+                pt.first += t_2 * seg_direction.first;
+                pt.second += t_2 * seg_direction.first;
+
+                pp::lookAheadPt = pt;
+                pp::lookAheadIndex = i + t_2;
+            }
+        }
+    }
+}
+
+void pp::findCurvature(point pos)
+{
+    double x, a, b, c, curv;
+    int sign;
+    double heading = odom::theta;
+    point t_pt = pp::lookAheadPt; //look ahead point
+
+    a = -tan(heading);
+    b = 1;
+    c = tan(heading) * pos.first - pos.second;
+
+    x = fabs(a * t_pt.first + b * t_pt.second + c) / sqrt(pow(a, 2.0) + pow(b, 2.0));
+
+    curv = 2 * x / pow(pp::lookAhead, 2.0);
+    
+    sign = sgn(sin(heading) * (t_pt.first - pos.first) - cos(heading) * (t_pt.second - pos.second));
+
+    pp::signedCurv = curv * sign;
+}
+
+std::pair<double, double> pp::findMotorVel()
+{
+    double v = pp::linearVel;
+    double l = v * (2 + pp::signedCurv * pp::robotWidth) / 2;
+    double r = v * (2 - pp::signedCurv * pp::robotWidth) / 2;
+
+    return {l, r};
+}
+
+void pp::runpp(std::vector<std::vector<double>> path)
+{
+    point pos;
+    while (pp::lastClosestIndex < path.size())
+    {
+    std::pair<double, double> motorVel;
+
+    pos.first = odom::y; pos.second = odom::x;
+    pp::findClosest(path, pos);
+    pp::lookAhead_f(path, pos);
+    pp::findCurvature(pos);
+    motorVel = pp::findMotorVel();
+
+    Ldrive.moveVoltage(motorVel.first * 1000);
+    Rdrive.moveVoltage(motorVel.second * 1000);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -132,17 +315,17 @@ namespace pp
 //     pp::angularVel = output;
 // }
 
-void pp::runpp(std::vector<std::vector<double>> path)
-{
-    while (pp::lastIndex <= path.size() - 2)
-    {
-        pp::ppStep1(path, {odom::y, odom::x}, gyro2.get_heading(), pp::lookAhead, pp::lastIndex);
-        std::cout << pp::angularVel << ", " << pp::lastIndex << std::endl;
-        Ldrive.moveVoltage(pp::linearVel + pp::angularVel);
-        Rdrive.moveVoltage(pp::linearVel - pp::angularVel);
-        pros::delay(20);
-    }
-}
+// void pp::runpp(std::vector<std::vector<double>> path)
+// {
+//     while (pp::lastIndex <= path.size() - 2)
+//     {
+//         pp::ppStep1(path, {odom::y, odom::x}, gyro2.get_heading(), pp::lookAhead, pp::lastIndex);
+//         std::cout << pp::angularVel << ", " << pp::lastIndex << std::endl;
+//         Ldrive.moveVoltage(pp::linearVel + pp::angularVel);
+//         Rdrive.moveVoltage(pp::linearVel - pp::angularVel);
+//         pros::delay(20);
+//     }
+// }
 
 // double pp::closest(std::vector<std::vector<double>> path, point pos)
 // {
