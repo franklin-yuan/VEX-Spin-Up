@@ -14,12 +14,12 @@ namespace pp
     // float kP = 1;
     const float robotWidth = 25.4;
     // const float lookAhead = 10;
-    const float linearVel = 100; //cms-1
+    const float linearVel = 3000; //voltage
     // double angularVel;
 
     // double t, t_i;
 
-    const float lookAhead = 10;
+    const float lookAhead = 50;
 
     int lastClosestIndex = 0;
     double lookAheadIndex = 0; //fractional index
@@ -31,6 +31,7 @@ namespace pp
     void findClosest(std::vector<std::vector<double>> path, point pos);
     void lookAhead_f(std::vector<std::vector<double>> path, point pos);
     void findCurvature(point pos);
+
     std::pair<double, double> findMotorVel();
 
 
@@ -46,7 +47,12 @@ void pp::findClosest(std::vector<std::vector<double>> path, point pos)
 
     for (int i = lastIndex; i < path.size(); i++)
     {
+        //std::cout << i << std::endl;
+
+        //DATA ABORT ISNT HERE
         d = distanceToPoint(pos, {path[i][0], path[i][1]});
+
+        //std::cout << path[i][0] << path[i][1] << std::endl;
         if (d < min){
             pp::lastClosestIndex = i;
         }
@@ -60,12 +66,12 @@ void pp::lookAhead_f(std::vector<std::vector<double>> path, point pos)
     point pt; 
     double a, b, c, d, t_1, t_2;
 
-    for (int i = 0; i < path.size(); i++)
+    for (int i = 0; i < path.size() - 1; i++)
     {
         seg_start = {path[i][0], path[i][1]};
-        seg_start = {path[i+1][0], path[i+1][1]};
+        seg_end = {path[i+1][0], path[i+1][1]};
 
-        seg_direction = {seg_start.first - seg_end.first, seg_start.second - seg_end.second};
+        seg_direction = {seg_end.first - seg_start.first, seg_end.second - seg_start.second};
 
         robot_vec = {seg_start.first - pos.first, seg_start.second - pos.second};
 
@@ -73,9 +79,11 @@ void pp::lookAhead_f(std::vector<std::vector<double>> path, point pos)
 
         b = 2 * (seg_direction.first * robot_vec.first + seg_direction.second * robot_vec.second); //f . d
 
-        c = pow(robot_vec.first, 2.0) + pow(robot_vec.second, 2) - pow(pp::lookAhead, 2.0); 
+        c = pow(robot_vec.first, 2.0) + pow(robot_vec.second, 2.0) - pow(pp::lookAhead, 2.0); 
 
-        d = pow(b, 2) - 4 * a * c;
+        d = pow(b, 2.0) - 4 * a * c;
+
+        //std::cout << d << std::endl;
 
         if (d < 0) 
         {
@@ -87,24 +95,30 @@ void pp::lookAhead_f(std::vector<std::vector<double>> path, point pos)
             t_1 = (-b - d) / (2 * a);
             t_2 = (-b + d) / (2 * a);
 
-            if (t_1 <= pp::lookAheadIndex && t_2 <= pp::lookAheadIndex){continue;}
+            // std::cout << t_1 << std::endl;
+            // std::cout << t_2 << std::endl;
+            //if (t_1 <= pp::lookAheadIndex && t_2 <= pp::lookAheadIndex){continue;}
 
             if (t_1 >= 0 && t_1 <= 1)
             {
                 pt = seg_start;
+                //std::cout << pt.first << ", " << pt.second << std::endl; 
                 pt.first += t_1 * seg_direction.first;
-                pt.second += t_1 * seg_direction.first;
+                pt.second += t_1 * seg_direction.second;
 
+                // std::cout << pt.first << " " << pt.second << std::endl;
                 pp::lookAheadPt = pt;
                 pp::lookAheadIndex = i + t_1;
             }
 
-            else if (t_2 >= 0 && t_2 <= 1)
+            if (t_2 >= 0 && t_2 <= 1)
             {
                 pt = seg_start;
+                //std::cout << pt.first << ", " << pt.second << std::endl; 
                 pt.first += t_2 * seg_direction.first;
-                pt.second += t_2 * seg_direction.first;
-
+                pt.second += t_2 * seg_direction.second;
+                
+                //std::cout << pt.first << " " << pt.second << std::endl;
                 pp::lookAheadPt = pt;
                 pp::lookAheadIndex = i + t_2;
             }
@@ -116,18 +130,20 @@ void pp::findCurvature(point pos)
 {
     double x, a, b, c, curv;
     int sign;
-    double heading = odom::theta;
+    double heading = degToRad(constrainAngle(gyro2.get_heading()));
+    double adj_heading = pi / 2 - heading;
+    //std::cout << radToDeg(heading) << std::endl;
     point t_pt = pp::lookAheadPt; //look ahead point
 
-    a = -tan(heading);
+    a = -tan(pi / 2 - adj_heading);
     b = 1;
-    c = tan(heading) * pos.first - pos.second;
+    c = tan(adj_heading) * pos.first - pos.second;
 
     x = fabs(a * t_pt.first + b * t_pt.second + c) / sqrt(pow(a, 2.0) + pow(b, 2.0));
 
     curv = 2 * x / pow(pp::lookAhead, 2.0);
     
-    sign = sgn(sin(heading) * (t_pt.first - pos.first) - cos(heading) * (t_pt.second - pos.second));
+    sign = sgn(sin(adj_heading) * (t_pt.first - pos.first) - cos(adj_heading) * (t_pt.second - pos.second));
 
     pp::signedCurv = curv * sign;
 }
@@ -135,6 +151,7 @@ void pp::findCurvature(point pos)
 std::pair<double, double> pp::findMotorVel()
 {
     double v = pp::linearVel;
+    std::cout << pp::signedCurv << pp::lookAheadPt.first << ", " << pp::lookAheadPt.second << std::endl;
     double l = v * (2 + pp::signedCurv * pp::robotWidth) / 2;
     double r = v * (2 - pp::signedCurv * pp::robotWidth) / 2;
 
@@ -146,16 +163,26 @@ void pp::runpp(std::vector<std::vector<double>> path)
     point pos;
     while (pp::lastClosestIndex < path.size())
     {
-    std::pair<double, double> motorVel;
+        //std::cout << path.size() << std::endl;
+        std::pair<double, double> motorVel;
 
-    pos.first = odom::y; pos.second = odom::x;
-    pp::findClosest(path, pos);
-    pp::lookAhead_f(path, pos);
-    pp::findCurvature(pos);
-    motorVel = pp::findMotorVel();
+        pos.first = odom::y; pos.second = odom::x;
 
-    Ldrive.moveVoltage(motorVel.first * 1000);
-    Rdrive.moveVoltage(motorVel.second * 1000);
+        //std::cout << pos.first << " " << pos.second << std::endl;
+        pp::findClosest(path, pos);
+        pp::lookAhead_f(path, pos);
+        pp::findCurvature(pos);
+        //std::cout << pp::signedCurv << std::endl;
+        //std::cout << pp::lookAheadPt.first << ", " << pp::lookAheadPt.second << std::endl;
+        motorVel = pp::findMotorVel();
+
+        //std::cout << lookAheadPt.first << " " << lookAheadPt.second << std::endl;
+
+        //std::cout << pp::lookAheadPt.first << " " << pp::lookAheadPt.second << std::endl;
+        //std::cout << motorVel.first << " " << motorVel.second << std::endl;
+        Ldrive.moveVoltage(motorVel.first);
+        Rdrive.moveVoltage(motorVel.second);
+        pros::delay(70);
     }
 }
 

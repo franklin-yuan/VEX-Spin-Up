@@ -18,7 +18,7 @@ void catapult() {
         } else {
             if (launch.changedToReleased()) {
                 while (limitSwitch.get_value()) {
-                    cata.moveVelocity(80);
+                    cata.moveVelocity(30);
                 }
                 cata.moveVelocity(0);
             }
@@ -30,7 +30,7 @@ void catapult() {
 
 void intakeControl() {
     if (intakeRun.isPressed()) {
-        intake.moveVelocity(-170);
+        intake.moveVelocity(-200);
     }
     else if (intakeRunBackwards.isPressed()) {
         intake.moveVelocity(170);
