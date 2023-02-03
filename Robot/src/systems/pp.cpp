@@ -131,17 +131,17 @@ void pp::findCurvature(point pos)
     double x, a, b, c, curv;
     int sign;
     double heading = degToRad(constrainAngle(gyro2.get_heading()));
-    double adj_heading = pi / 2 - heading;
+    double adj_heading = pi / 2 - heading; //heaidng is from the x axis lol
     //std::cout << radToDeg(heading) << std::endl;
     point t_pt = pp::lookAheadPt; //look ahead point
 
-    a = -tan(pi / 2 - adj_heading);
+    a = -tan(adj_heading);
     b = 1;
     c = tan(adj_heading) * pos.first - pos.second;
 
-    x = fabs(a * t_pt.first + b * t_pt.second + c) / sqrt(pow(a, 2.0) + pow(b, 2.0));
+    x = fabs(a * t_pt.first + b * t_pt.second + c) / sqrt(pow(a, 2.0) + 1);
 
-    curv = 2 * x / pow(pp::lookAhead, 2.0);
+    curv = (2 * x) / (pow(pp::lookAhead, 2.0));
     
     sign = sgn(sin(adj_heading) * (t_pt.first - pos.first) - cos(adj_heading) * (t_pt.second - pos.second));
 
