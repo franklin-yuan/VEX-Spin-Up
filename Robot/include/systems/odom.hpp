@@ -26,6 +26,7 @@ namespace odom {
 void updatePosPilons(float left, float right, float side, float gyro);
 void updatePos(float left, float right, float side, float gyro);
 void printPos();
+void printPosToScreen();
 void resetEncoders();
 void printEncoders();
 void ramseteManual(double xd, double yd, double thetad, double vd, double omegad, float b, float z);

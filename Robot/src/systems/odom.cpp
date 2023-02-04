@@ -16,6 +16,7 @@ namespace odom {
 
     void updatePos(float left, float right, float side, float gyro);
     void printPos();
+    void printPosToScreen();
     void resetEncoders();
     void printEncoders();
     void ramseteManual(double xd, double yd, double thetad, double omegad, double vd, float b, float z);
@@ -231,6 +232,11 @@ void odom::ramseteManual(double xd, double yd, double thetad, double vd, double 
 
 void odom::printPos() {
     std::cout << "(" << x << "," << y << "," << theta << ")" << std::endl;
+    pros::lcd::print(1, "(%f,%f,%f degrees)", x, y, radToDeg(theta));
+}
+
+void odom::printPosToScreen() {
+    //std::cout << "(" << x << "," << y << "," << theta << ")" << std::endl;
     pros::lcd::print(1, "(%f,%f,%f degrees)", x, y, radToDeg(theta));
 }
 

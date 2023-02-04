@@ -22,8 +22,8 @@ double radToDeg(double x) {
 double distanceToPoint(point pt1, point pt2) {
     double pt1x, pt1y, pt2x, pt2y;
 
-    std::tie(pt1x, pt2x) = pt1;
-    std::tie(pt2x, pt2y) = pt2;
+    pt1x = pt1.first; pt1y = pt1.second;
+    pt2x = pt2.first; pt2y = pt2.second;
 
     return pow(pow(pt2x - pt1x, 2) + pow(pt2y - pt1y, 2), 0.5);
 

@@ -14,12 +14,12 @@ namespace pp
     // float kP = 1;
     const float robotWidth = 25.4;
     // const float lookAhead = 10;
-    const float linearVel = 3000; //voltage
+    const float linearVel = 5000; //voltage
     // double angularVel;
 
     // double t, t_i;
 
-    const float lookAhead = 50;
+    const float lookAhead = 25;
 
     int lastClosestIndex = 0;
     double lookAheadIndex = 0; //fractional index
@@ -97,7 +97,7 @@ void pp::lookAhead_f(std::vector<std::vector<double>> path, point pos)
 
             // std::cout << t_1 << std::endl;
             // std::cout << t_2 << std::endl;
-            //if (t_1 <= pp::lookAheadIndex && t_2 <= pp::lookAheadIndex){continue;}
+            if ((i + t_1) <= pp::lookAheadIndex && (i + t_2) <= pp::lookAheadIndex){continue;}
 
             if (t_1 >= 0 && t_1 <= 1)
             {
@@ -161,7 +161,7 @@ std::pair<double, double> pp::findMotorVel()
 void pp::runpp(std::vector<std::vector<double>> path)
 {
     point pos;
-    while (pp::lastClosestIndex < path.size())
+    while (distanceToPoint(pos, {path[path.size()-1][0],path[path.size()-1][1]}) > 10)
     {
         //std::cout << path.size() << std::endl;
         std::pair<double, double> motorVel;
@@ -182,8 +182,12 @@ void pp::runpp(std::vector<std::vector<double>> path)
         //std::cout << motorVel.first << " " << motorVel.second << std::endl;
         Ldrive.moveVoltage(motorVel.first);
         Rdrive.moveVoltage(motorVel.second);
-        pros::delay(70);
+
+        std::cout << distanceToPoint(pos, {path[path.size()-1][0],path[path.size()-1][1]}) << std::endl;
+        pros::delay(30);
+        odom::printPosToScreen();
     }
+    chassis->stop();
 }
 
 
