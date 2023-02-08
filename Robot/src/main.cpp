@@ -36,7 +36,9 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+    //drawAutonSelector();
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -49,7 +51,12 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+    pros::Task catapultTask(catapult);
+    pros::Task odomTask(runOdomTracking);
+
+    carry();
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -65,7 +72,7 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    //pros::Task catapultTask(catapult);
+    pros::Task catapultTask(catapult);
     pros::Task odomTask(runOdomTracking);
     
     // for (int i = 1; i < path.size(); i++){
@@ -84,9 +91,7 @@ void opcontrol() {
     // pidTurn(180, 2.4, 2, 0);
     // pidDrive(100, 180);
     // pidTurn(0, 2.4, 2, 0);
-
-    pp::runpp(path);
-
+    roll(false);
 
     // while (true) {
     //     opDrive();

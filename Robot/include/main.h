@@ -60,6 +60,12 @@ using namespace okapi;
 #include "systems/util.hpp"
 #include "systems/pid.hpp"
 #include "systems/pp.hpp"
+#include "systems/roller.hpp"
+
+#include "autons/match.hpp"
+#include "autons/skills.hpp"
+
+#include "autonselect.hpp"
 
 /**
  * Prototypes for the competition control tasks are redefined here to ensure

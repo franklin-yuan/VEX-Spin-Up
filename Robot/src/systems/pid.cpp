@@ -50,16 +50,78 @@ void pidTurn(float theta_d, float kP, float kD, float kI){
     
 }
 
-void pidDrive(float distance, double angle){
+void pidTurnToPoint(point target, float kP, float kD, float kI){
+    
+
+    double theta_d;
+    double derivative, integral = 0;
+    double error, lastError;
+    double currentAngle;
+    double output;
+    int count;
+
+    theta_d = constrainAngle(radToDeg(atan2(target.second - odom::x, target.first - odom::y)));
+    std::cout << theta_d << std::endl;
+
+    currentAngle = gyro2.get_heading();
+
+    error = theta_d - currentAngle;
+
+    error = constrainAngle(error);
+
+    lastError = error;
+
+    double max = 100;
+
+    while (count < 5){
+        currentAngle = gyro2.get_heading();
+
+        error = theta_d - currentAngle;
+
+        error = constrainAngle(error);
+
+        derivative = (constrainAngle(error - lastError));
+
+        integral += error;
+
+        output = (error*kP/360)+(derivative/360*kD)+((integral*kI)/360);
+        output = std::clamp(output, -max, max);
+
+        chassis->rotate(output);
+
+        count = fabs(error) < 1 ? count + 1: 0;
+
+        lastError = error;
+
+        max += 6;
+
+        pros::delay(20);
+
+    }
+
+    chassis->stop();
+
+    
+}
+/*
+@param distance distance in cm
+@param angle target angle
+@param speed max speed to clamp distance pid output, uses voltage mode
+@param kp for turning to adjust sensitivity for distance
+*/
+void pidDrive(float distance, double angle, double speed, double kP_a = 0.15){
     
     float leftEnc, rightEnc, leftEnc_init, rightEnc_init;
+    point pos, lastpos = {odom::y, odom::x};
 
     leftEnc_init = leftEncoder.get_value();
     rightEnc_init = rightEncoder.get_value();
     leftEnc = (leftEncoder.get_value() - leftEnc_init) * DEGREES_TO_CM;
     rightEnc = (rightEncoder.get_value() - rightEnc_init) * DEGREES_TO_CM;
 
-    float currentDistance = (leftEnc + rightEnc) / 2;
+    //float currentDistance = (leftEnc + rightEnc) / 2;
+
+    float currentDistance = 0;
     double currentAngle;
 
     double derivative_d, integral_d;
@@ -78,7 +140,6 @@ void pidDrive(float distance, double angle){
     float kD_d = 0.1;
     float kI_d = 0;
 
-    float kP_a = 0.15;
     float kD_a = 0;
     float kI_a = 0;
 
@@ -86,10 +147,19 @@ void pidDrive(float distance, double angle){
     double max_r = 7200;
 
     while (count < 5){
+
+        pos = {odom::y, odom::x};
         leftEnc = fabs((leftEncoder.get_value() - leftEnc_init) * DEGREES_TO_CM);
         rightEnc = fabs((rightEncoder.get_value() - rightEnc_init) * DEGREES_TO_CM);
 
-        currentDistance = (leftEnc + rightEnc) / 2;
+        //currentDistance = (leftEnc + rightEnc) / 2;
+        if (distance > 0){
+            currentDistance += distanceToPoint(pos, lastpos);
+        }
+        else{
+            currentDistance -= distanceToPoint(pos, lastpos);
+        }
+
 
         currentAngle = constrainAngle(gyro2.get_heading());
 
@@ -109,8 +179,8 @@ void pidDrive(float distance, double angle){
 
         output_d_l = std::clamp(output_d, -max_l, max_l);
         output_d_r = std::clamp(output_d, -max_r, max_r);
-        output_d_l = std::clamp(output_d_l, -10000.0, 10000.0);
-        output_d_r = std::clamp(output_d_r, -10000.0, 10000.0);
+        output_d_l = std::clamp(output_d_l, -speed, speed);
+        output_d_r = std::clamp(output_d_r, -speed, speed);
         double motorL = output_d_l + output_a;
         double motorR = output_d_r - output_a;
         //motorL = std::clamp(motorL, -max, max);
@@ -125,6 +195,8 @@ void pidDrive(float distance, double angle){
         count = fabs(error_d) < 2 ? count + 1: 0;
         max_l += 150;
         max_r += 150;
+
+        lastpos = pos;
         pros::delay(10);
     }
 
@@ -132,3 +204,4 @@ void pidDrive(float distance, double angle){
 
     
 }
+

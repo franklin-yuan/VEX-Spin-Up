@@ -14,12 +14,12 @@ namespace pp
     // float kP = 1;
     const float robotWidth = 25.4;
     // const float lookAhead = 10;
-    const float linearVel = 5000; //voltage
+    const float linearVel = 4000; //voltage
     // double angularVel;
 
     // double t, t_i;
 
-    const float lookAhead = 25;
+    const float lookAhead = 35;
 
     int lastClosestIndex = 0;
     double lookAheadIndex = 0; //fractional index
@@ -27,7 +27,7 @@ namespace pp
     double signedCurv;
 
     // void ppStep1(std::vector<std::vector<double>> path, point currentPos, double currentHeading, float lookAhead, int lastIndex);
-    void runpp(std::vector<std::vector<double>> path);
+    void runpp(std::vector<std::vector<double>> path, bool direction);
     void findClosest(std::vector<std::vector<double>> path, point pos);
     void lookAhead_f(std::vector<std::vector<double>> path, point pos);
     void findCurvature(point pos);
@@ -151,14 +151,17 @@ void pp::findCurvature(point pos)
 std::pair<double, double> pp::findMotorVel()
 {
     double v = pp::linearVel;
-    std::cout << pp::signedCurv << pp::lookAheadPt.first << ", " << pp::lookAheadPt.second << std::endl;
+    //std::cout << pp::signedCurv << pp::lookAheadPt.first << ", " << pp::lookAheadPt.second << std::endl;
     double l = v * (2 + pp::signedCurv * pp::robotWidth) / 2;
     double r = v * (2 - pp::signedCurv * pp::robotWidth) / 2;
 
     return {l, r};
 }
-
-void pp::runpp(std::vector<std::vector<double>> path)
+/*
+@param path: dynamic array containing tuples of coordinates 
+@param direction: true for forwards, false for backwards
+*/
+void pp::runpp(std::vector<std::vector<double>> path, bool direction)
 {
     point pos;
     while (distanceToPoint(pos, {path[path.size()-1][0],path[path.size()-1][1]}) > 10)
@@ -180,12 +183,15 @@ void pp::runpp(std::vector<std::vector<double>> path)
 
         //std::cout << pp::lookAheadPt.first << " " << pp::lookAheadPt.second << std::endl;
         //std::cout << motorVel.first << " " << motorVel.second << std::endl;
+
+        if (!direction) {motorVel.first *= -1; motorVel.second *= -1;}
+
         Ldrive.moveVoltage(motorVel.first);
         Rdrive.moveVoltage(motorVel.second);
 
-        std::cout << distanceToPoint(pos, {path[path.size()-1][0],path[path.size()-1][1]}) << std::endl;
+        //std::cout << distanceToPoint(pos, {path[path.size()-1][0],path[path.size()-1][1]}) << std::endl;
         pros::delay(30);
-        odom::printPosToScreen();
+        //odom::printPosToScreen();
     }
     chassis->stop();
 }
