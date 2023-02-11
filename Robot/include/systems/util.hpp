@@ -7,4 +7,5 @@ extern double constrainAngle(double angle);
 extern double degToRad(double x);
 extern double radToDeg(double x);
 extern double distanceToPoint(point pt1, point pt2);
+extern double angleToBearing(double angle);
 extern int sgn(double x);

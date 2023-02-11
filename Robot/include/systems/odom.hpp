@@ -37,7 +37,15 @@ extern double theta, x, y;
 
 extern void runOdomTracking();
 extern std::vector<std::vector<double>> path;
-extern std::vector<std::vector<double>>* path_ptr;
+extern std::vector<std::vector<double>> path1;
+extern std::vector<std::vector<double>> path2;
+extern std::vector<std::vector<double>> path3;
+extern std::vector<std::vector<double>> path_s_1;
+extern std::vector<std::vector<double>> path_s_2;
+extern std::vector<std::vector<double>> path_s_3;
+extern std::vector<std::vector<double>> path_s_4;
+extern std::vector<std::vector<double>> path_s_5;
+extern std::vector<std::vector<double>> path_s_6;
 
 extern pros::ADIEncoder leftEncoder;
 extern pros::ADIEncoder rightEncoder;

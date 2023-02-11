@@ -18,7 +18,7 @@ void roll(bool colour)
     bool atRoller = false;
     int hue; 
     int dist;
-    setIntake(80);
+    setIntake(150);
     while (!correctColour)
     {
         hue = colourSensor.get_hue();
@@ -37,7 +37,7 @@ void roll(bool colour)
 
         pros::delay(50);
     }
-    pros::delay(300);
+    pros::delay(200);
     setIntake(0);
 }
 

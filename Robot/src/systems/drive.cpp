@@ -29,14 +29,14 @@ void opDrive(){
 /*
 Drives forwards until colour sensor senses the roller, using open-loop control.
 */
-void driveUntilRoller(){
+void driveUntilRoller(double fPower){
     int count = 0;
     int dist = 0;
 
     while (count < 5)
     {
         dist = colourSensor.get_proximity();
-        chassis->forward(0.1);
+        chassis->forward(fPower);
 
         count = dist > 230 ? count + 1 : 0;
         pros::delay(40);

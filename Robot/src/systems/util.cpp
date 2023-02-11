@@ -28,3 +28,19 @@ double distanceToPoint(point pt1, point pt2) {
     return pow(pow(pt2x - pt1x, 2) + pow(pt2y - pt1y, 2), 0.5);
 
 }
+
+/*
+@param angle DEGREES
+*/
+double angleToBearing(double angle) {
+    if (sgn(angle) > 0){
+        return 90 - angle;
+    }
+    else if (sgn(angle) < 0){
+        return angle - 90;
+    }
+    else{
+        return angle;
+    }
+}      
+

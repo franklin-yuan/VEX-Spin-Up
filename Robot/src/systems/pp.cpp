@@ -14,12 +14,12 @@ namespace pp
     // float kP = 1;
     const float robotWidth = 25.4;
     // const float lookAhead = 10;
-    const float linearVel = 4000; //voltage
+    float linearVel; //voltage
     // double angularVel;
 
     // double t, t_i;
 
-    const float lookAhead = 35;
+    float lookAhead = 35;
 
     int lastClosestIndex = 0;
     double lookAheadIndex = 0; //fractional index
@@ -27,11 +27,11 @@ namespace pp
     double signedCurv;
 
     // void ppStep1(std::vector<std::vector<double>> path, point currentPos, double currentHeading, float lookAhead, int lastIndex);
-    void runpp(std::vector<std::vector<double>> path, bool direction);
+    void runpp(std::vector<std::vector<double>> path, bool direction, float speed);
     void findClosest(std::vector<std::vector<double>> path, point pos);
     void lookAhead_f(std::vector<std::vector<double>> path, point pos);
     void findCurvature(point pos);
-
+    void pidForwardVel(std::vector<std::vector<double>> path, point pos, double kP, double max);
     std::pair<double, double> findMotorVel();
 
 
@@ -161,10 +161,13 @@ std::pair<double, double> pp::findMotorVel()
 @param path: dynamic array containing tuples of coordinates 
 @param direction: true for forwards, false for backwards
 */
-void pp::runpp(std::vector<std::vector<double>> path, bool direction)
+void pp::runpp(std::vector<std::vector<double>> path, bool direction, float speed, float lookAhead)
 {
+    pp::lookAhead = lookAhead;
+    pp::linearVel = speed;
     point pos;
-    while (distanceToPoint(pos, {path[path.size()-1][0],path[path.size()-1][1]}) > 10)
+    pp::lookAheadPt = {path[0][0], path[0][1]};
+    while (distanceToPoint(pos, {path[path.size()-1][0],path[path.size()-1][1]}) > 7)
     {
         //std::cout << path.size() << std::endl;
         std::pair<double, double> motorVel;
@@ -175,6 +178,8 @@ void pp::runpp(std::vector<std::vector<double>> path, bool direction)
         pp::findClosest(path, pos);
         pp::lookAhead_f(path, pos);
         pp::findCurvature(pos);
+        pp::pidForwardVel(path, pos, 350, speed);
+
         //std::cout << pp::signedCurv << std::endl;
         //std::cout << pp::lookAheadPt.first << ", " << pp::lookAheadPt.second << std::endl;
         motorVel = pp::findMotorVel();
@@ -194,6 +199,18 @@ void pp::runpp(std::vector<std::vector<double>> path, bool direction)
         //odom::printPosToScreen();
     }
     chassis->stop();
+}
+
+void pp::pidForwardVel(std::vector<std::vector<double>> path, point pos, double kP, double max)
+{
+    double d = distanceToPoint(pos, {path[path.size()-1][0],path[path.size()-1][1]});
+
+    std::cout << "D: " << d << std::endl;
+
+    double output = d*kP;
+    output = std::clamp(output, -max, max);
+    std::cout << output << std::endl;
+    pp::linearVel = output;
 }
 
 

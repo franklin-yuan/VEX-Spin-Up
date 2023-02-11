@@ -50,7 +50,11 @@ void pidTurn(float theta_d, float kP, float kD, float kI){
     
 }
 
-void pidTurnToPoint(point target, float kP, float kD, float kI){
+/*
+@param end True for catapult end, False for intake end (points to point)
+*/
+
+void pidTurnToPoint(point target, float kP, float kD, float kI, bool end){
     
 
     double theta_d;
@@ -60,7 +64,12 @@ void pidTurnToPoint(point target, float kP, float kD, float kI){
     double output;
     int count;
 
-    theta_d = constrainAngle(radToDeg(atan2(target.second - odom::x, target.first - odom::y)));
+    std::cout << odom::x << " " << odom::y << std::endl;
+    theta_d = angleToBearing(constrainAngle(radToDeg(atan2(target.second - odom::x, target.first - odom::y))));
+    theta_d *= -1;
+    if (end) {theta_d += 180;}
+    theta_d = constrainAngle(theta_d);
+
     std::cout << theta_d << std::endl;
 
     currentAngle = gyro2.get_heading();
@@ -107,9 +116,9 @@ void pidTurnToPoint(point target, float kP, float kD, float kI){
 @param distance distance in cm
 @param angle target angle
 @param speed max speed to clamp distance pid output, uses voltage mode
-@param kp for turning to adjust sensitivity for distance
+@param kp for turning to adjust sensitivity for distance, default to 0.15
 */
-void pidDrive(float distance, double angle, double speed, double kP_a = 0.15){
+void pidDrive(float distance, double angle, double speed, double kP_a){
     
     float leftEnc, rightEnc, leftEnc_init, rightEnc_init;
     point pos, lastpos = {odom::y, odom::x};
@@ -146,6 +155,8 @@ void pidDrive(float distance, double angle, double speed, double kP_a = 0.15){
     double max_l = 6000;
     double max_r = 7200;
 
+    double motorL, motorR;
+
     while (count < 5){
 
         pos = {odom::y, odom::x};
@@ -176,21 +187,20 @@ void pidDrive(float distance, double angle, double speed, double kP_a = 0.15){
         output_d = (error_d*100*kP_d)+(derivative_d*100*kD_d)+((integral_d*100*kI_d));
         output_a = (error_a*360*kP_a)+(derivative_a*360*kD_a)+((integral_a*360*kI_a));
 
-
         output_d_l = std::clamp(output_d, -max_l, max_l);
         output_d_r = std::clamp(output_d, -max_r, max_r);
         output_d_l = std::clamp(output_d_l, -speed, speed);
         output_d_r = std::clamp(output_d_r, -speed, speed);
-        double motorL = output_d_l + output_a;
-        double motorR = output_d_r - output_a;
+        motorL = output_d_l + output_a;
+        motorR = output_d_r - output_a;
         //motorL = std::clamp(motorL, -max, max);
         //motorR = std::clamp(motorR, -max, max);
 
         Ldrive.moveVoltage(motorL);
         Rdrive.moveVoltage(motorR);
 
-        float lastError_d = error_d;
-        float lastError_a = error_a;
+        lastError_d = error_d;
+        lastError_a = error_a;
 
         count = fabs(error_d) < 2 ? count + 1: 0;
         max_l += 150;
