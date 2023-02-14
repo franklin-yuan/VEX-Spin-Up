@@ -55,7 +55,7 @@ void autonomous() {
     pros::Task catapultTask(catapult);
     pros::Task odomTask(runOdomTracking);
 
-    skills();
+    carry(true);
 }
 
 /**
@@ -96,6 +96,8 @@ void opcontrol() {
     while (true) {
         opDrive();
         intakeControl();
+        shootExpansion();
+        enableBoostOp();
         //oproll(true);
         odom::printPos();
         pros::delay(20);

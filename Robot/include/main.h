@@ -65,7 +65,6 @@ using namespace okapi;
 #include "autons/match.hpp"
 #include "autons/skills.hpp"
 
-#include "autonselect.hpp"
 
 /**
  * Prototypes for the competition control tasks are redefined here to ensure

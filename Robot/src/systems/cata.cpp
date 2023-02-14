@@ -6,10 +6,17 @@
 Motor cata(CATA_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::counts);
 Motor intake(INTAKE_PORT, false, AbstractMotor::gearset::blue, AbstractMotor::encoderUnits::counts);
 pros::ADIDigitalIn limitSwitch(LIMIT_SWITCH);
-ControllerButton launch(ControllerDigital::A);
+pros::ADIDigitalOut endgame('E', false);
+pros::ADIDigitalOut boost('C', true);
+ControllerButton launch(ControllerDigital::right);
 ControllerButton intakeRun(ControllerDigital::R1);
 ControllerButton intakeRunBackwards(ControllerDigital::R2);
-bool shoot;
+ControllerButton expand1(ControllerDigital::A);
+ControllerButton expand2(ControllerDigital::X);
+ControllerButton boostButton(ControllerDigital::B);
+
+bool toggle1 = false;
+bool latch1 = false;
 
 void catapult() {
     while (true) {
@@ -23,7 +30,7 @@ void catapult() {
                 while (limitSwitch.get_value()) {
                     cata.moveVelocity(30);
                 }
-                pros::delay(100);
+                pros::delay(20);
                 cata.moveVelocity(0);
             }
             cata.moveVelocity(0);
@@ -56,4 +63,35 @@ void intakeControl() {
 
 void setIntake(int vel) {
     intake.moveVelocity(vel);
+}
+
+void shootExpansion() {
+    if (expand1.isPressed() && expand2.isPressed())
+    {
+        endgame.set_value(true);
+        pros::delay(500);
+        endgame.set_value(false);
+    }
+}
+
+void enableBoost(bool enable) {
+    boost.set_value(enable);
+}
+
+void enableBoostOp() {
+    if(boostButton.isPressed()){
+        if(!latch1){
+            toggle1=!toggle1;
+            latch1=true;
+        }
+    }
+    else{
+        latch1=false;
+    }
+    if(toggle1){
+        boost.set_value(false);
+    }
+    else{
+        boost.set_value(true);
+    }
 }

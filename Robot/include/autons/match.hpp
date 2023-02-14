@@ -1,4 +1,4 @@
 #pragma once
 #include "main.h"
 
-extern void carry();
+extern void carry(bool team);
