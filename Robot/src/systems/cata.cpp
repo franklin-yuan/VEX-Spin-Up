@@ -30,7 +30,7 @@ void catapult() {
                 while (limitSwitch.get_value()) {
                     cata.moveVelocity(30);
                 }
-                pros::delay(20);
+                pros::delay(400);
                 cata.moveVelocity(0);
             }
             cata.moveVelocity(0);

@@ -145,7 +145,7 @@ void pidDrive(float distance, double angle, double speed, double kP_a){
     float lastError_d = error_d;
     float lastError_a = error_a;
 
-    float kP_d = 3.5;
+    float kP_d = 3.55;
     float kD_d = 0.1;
     float kI_d = 0;
 
