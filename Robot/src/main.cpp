@@ -55,7 +55,7 @@ void autonomous() {
     pros::Task catapultTask(catapult);
     pros::Task odomTask(runOdomTracking);
 
-    teamR(true);
+    skills();
 }
 
 /**

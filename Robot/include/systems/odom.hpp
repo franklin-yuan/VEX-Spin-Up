@@ -52,6 +52,7 @@ extern std::vector<std::vector<double>> path_s_1_2;
 extern std::vector<std::vector<double>> path_s_1_3;
 extern std::vector<std::vector<double>> path_s_1_4;
 extern std::vector<std::vector<double>> path_s_1_5;
+extern std::vector<std::vector<double>> path_s_1_7;
 extern pros::ADIEncoder leftEncoder;
 extern pros::ADIEncoder rightEncoder;
 extern pros::ADIEncoder sideEncoder;
