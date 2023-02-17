@@ -60,17 +60,31 @@ void teamR(bool team)
     enableBoost(true);
     pidDrive(-7, 0, 6000, 0.1);
     delay(10);
-    pidTurnToPoint({-110, -310}, 2.4, 2, 0, true);
-    pidDrive(-50, gyro2.get_heading(), 6000, 0.1);
+    pidTurnToPoint({-110, -360}, 2.4, 2, 0, true);
+    pidDrive(-55, gyro2.get_heading(), 6000, 0.1);
     delay(10);
     shootCata();
-    pidDrive(7, 0, 6000, 0.3);
+    setIntake(0);
+    pros::delay(300);
+    pidDrive(20, 0, 6000, 0.5);
     delay(10);
     setIntake(-600);
     pidTurn(125, 2.41, 2, 0);
     pidDrive(100, 135, 5000, 0.1);
-    pidTurnToPoint({-110, -300}, 2.4, 2, 0, true);
-    pidDrive(-30, gyro2.get_heading(), 6000, 0.1);
+    delay(10);
+    pidTurnToPoint({-110, -290}, 2.4, 2, 0, true);
+    pidDrive(-20, gyro2.get_heading(), 6000, 0.1);
     delay(10);
     shootCata();
+    setIntake(0);
+    delay(300);
+    pidTurn(-45, 2.41, 2, 0);
+    pidDrive(160, -45, 6000, 0.1);
+    delay(10);
+    pidTurn(0, 2.41, 2, 0);
+    driveUntilRoller();
+    chassis->forward(0.005);
+    roll(team);
+    chassis->stop();
+
 }

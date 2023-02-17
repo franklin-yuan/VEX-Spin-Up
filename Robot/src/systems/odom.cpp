@@ -268,7 +268,3 @@ void runOdomTracking() {
         pros::delay(30);
     }
 }
-
-int main(){
-    odom::readFile();
-}

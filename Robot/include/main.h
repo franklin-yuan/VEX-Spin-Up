@@ -64,6 +64,7 @@ using namespace okapi;
 
 #include "autons/match.hpp"
 #include "autons/skills.hpp"
+#include "autonselector.hpp"
 
 
 /**

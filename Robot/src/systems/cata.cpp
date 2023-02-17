@@ -6,11 +6,12 @@
 Motor cata(CATA_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::counts);
 Motor intake(INTAKE_PORT, false, AbstractMotor::gearset::blue, AbstractMotor::encoderUnits::counts);
 pros::ADIDigitalIn limitSwitch(LIMIT_SWITCH);
-pros::ADIDigitalOut endgame('E', false);
+pros::ADIDigitalOut endgame('E', ENDGAME_DEFAULT);
 pros::ADIDigitalOut boost('C', true);
 ControllerButton launch(ControllerDigital::right);
 ControllerButton intakeRun(ControllerDigital::R1);
 ControllerButton intakeRunBackwards(ControllerDigital::R2);
+ControllerButton intakeSlow(ControllerDigital::down);
 ControllerButton expand1(ControllerDigital::A);
 ControllerButton expand2(ControllerDigital::X);
 ControllerButton boostButton(ControllerDigital::B);
@@ -30,7 +31,7 @@ void catapult() {
                 while (limitSwitch.get_value()) {
                     cata.moveVelocity(30);
                 }
-                pros::delay(400);
+                pros::delay(300);
                 cata.moveVelocity(0);
             }
             cata.moveVelocity(0);
@@ -55,6 +56,9 @@ void intakeControl() {
     }
     else if (intakeRunBackwards.isPressed()) {
         intake.moveVelocity(400);
+    }
+    else if (intakeSlow.isPressed()) {
+        intake.moveVelocity(100);
     }
     else{
         intake.moveVelocity(0);

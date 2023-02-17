@@ -1,5 +1,8 @@
 #include "main.h"
 
+
+bool skillsEnabled = true;
+bool testAuton = false;
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -7,7 +10,6 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    pros::lcd::initialize();
     gyro1.reset();
     gyro2.reset();
     // while (gyro1.is_calibrating() || gyro2.is_calibrating()) {
@@ -25,7 +27,9 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+void disabled() {
+
+}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field
@@ -37,7 +41,7 @@ void disabled() {}
  * starts.
  */
 void competition_initialize() {
-    //drawAutonSelector();
+    drawAutonSelector();
 }
 
 /**
@@ -54,8 +58,29 @@ void competition_initialize() {
 void autonomous() {
     pros::Task catapultTask(catapult);
     pros::Task odomTask(runOdomTracking);
-
-    skills();
+	if(skillsEnabled){
+		skills();
+	}else if(testAuton){
+		//WHATEVER AUTON TO TEST
+		teamL(true);
+	}else{
+		if(autonEnabled){
+			if(redAlliance){
+				if(rollerDifficulty == 1){
+					teamL(false);
+				}
+                else{
+					teamR(false);
+				}
+			}else{
+				if(rollerDifficulty == 1){
+					teamL(true);
+				}else{
+					teamR(true);
+				}
+			}
+		}
+	}
 }
 
 /**
