@@ -2,15 +2,17 @@
 using pros::delay;
 void skills()
 {
+
+    boostEnabled = false;
     enableBoost(false);
     //roller1
     driveUntilRoller();
-    chassis->forward(0.002);
+    //chassis->forward(0.003);
     roll(false);
     chassis->stop();
     pidDrive(-35, 0, 6000, 0.1); 
     delay(10);
-    pidTurn(90, 2.44, 2.5, 0);
+    pidTurn(65, 2.44, 2.5, 0);
     delay(10);
     setIntake(-600);
     pidDrive(45, 90, 4000);
@@ -21,7 +23,7 @@ void skills()
 
     //roller2
     driveUntilRoller();
-    chassis->forward(0.002);
+    //chassis->forward(0.003);
     roll(false);
     chassis->stop();
     pidDrive(-30, 90, 5000, 0.1); 
@@ -87,21 +89,20 @@ void skills()
     //roller 3
     pidTurn(-80, 2.4, 2, 0);
     setIntake(-600);
-    pidDrive(70, gyro2.get_heading(), 9000, 0.11);
+    pidDrive(80, gyro2.get_heading(), 9000, 0.11);
     delay(10);
     pidDrive(15, gyro2.get_heading(), 4000, 0.11);
     delay(10);
     pidTurn(-90, 2.4, 2, 0);
-    pidDrive(80, -90, 3000, 0.11);
+    pidDrive(70, -90, 3000, 0.11);
     delay(10);
     pidDrive(-10, -90, 5000, 0.11);
     delay(10);
     setIntake(0);
     driveUntilRoller();
-    chassis->forward(0.002);
     roll(false);
     chassis->stop();
-    pidDrive(-75, -90, 5000, 0.1); 
+    pidDrive(-70, -90, 5000, 0.1); 
     delay(10);
     setIntake(-600);
     pidTurn(180, 2.4, 2, 0);
@@ -112,7 +113,6 @@ void skills()
     setIntake(0);
     //roller 4
     driveUntilRoller();
-    chassis->forward(0.002);
     roll(false);
     chassis->stop();
 

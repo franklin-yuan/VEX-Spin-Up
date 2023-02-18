@@ -10,4 +10,6 @@ extern void enableBoost(bool enable);
 extern void enableBoostOp();
 extern pros::ADIDigitalOut endgame;
 
+extern bool boostEnabled;
+
 #define ENDGAME_DEFAULT false

@@ -7,4 +7,4 @@ extern MotorGroup Rdrive;
 extern std::shared_ptr<okapi::ChassisModel> chassis;
 
 extern void opDrive();
-extern void driveUntilRoller(double fPower = 0.1);
+extern void driveUntilRoller(double fPower = 0.2);

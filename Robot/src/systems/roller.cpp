@@ -19,8 +19,15 @@ void roll(bool colour)
     int hue; 
     int dist;
     setIntake(150);
+    uint32_t startTime = pros::millis();
     while (!correctColour)
     {
+
+        if((pros::millis()-startTime > 2000)){
+            chassis->stop();
+            break;
+        }
+        
         hue = colourSensor.get_hue();
         dist = colourSensor.get_proximity();
 
@@ -72,7 +79,7 @@ void oproll(bool colour)
 
             pros::delay(50);
         }
-        pros::delay(300);
+        pros::delay(400);
         setIntake(0);
     }
 }

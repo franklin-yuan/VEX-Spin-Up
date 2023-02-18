@@ -33,12 +33,20 @@ void driveUntilRoller(double fPower){
     int count = 0;
     int dist = 0;
 
-    while (count < 5)
+    uint32_t startTime = pros::millis();
+
+    while (count < 3)
     {
+
         dist = colourSensor.get_proximity();
         chassis->forward(fPower);
 
-        count = dist > 230 ? count + 1 : 0;
+        if((pros::millis()-startTime > 5000)){
+            chassis->stop();
+            break;
+        }
+
+        count = dist > 220 ? count + 1 : 0;
         pros::delay(40);
     }
 

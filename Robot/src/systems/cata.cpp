@@ -19,19 +19,21 @@ ControllerButton boostButton(ControllerDigital::B);
 bool toggle1 = false;
 bool latch1 = false;
 
+bool boostEnabled = false;
+
 void catapult() {
     while (true) {
         // If limit switch not pressed move down
         if (!limitSwitch.get_value()) {
-            cata.moveVelocity(80);
+            cata.moveVelocity(100);
         }
         else {
-            pros::Task::delay(50);
-            if (launch.changedToReleased()) {
+            if (boostEnabled) {pros::Task::delay(70);}
+            pros::Task::delay(10);
+            if (launch.isPressed()) {
                 while (limitSwitch.get_value()) {
                     cata.moveVelocity(30);
                 }
-                pros::delay(300);
                 cata.moveVelocity(0);
             }
             cata.moveVelocity(0);
@@ -52,7 +54,7 @@ void shootCata()
 
 void intakeControl() {
     if (intakeRun.isPressed()) {
-        intake.moveVelocity(-600);
+        intake.moveVelocity(-400);
     }
     else if (intakeRunBackwards.isPressed()) {
         intake.moveVelocity(400);

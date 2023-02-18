@@ -19,7 +19,13 @@ void pidTurn(float theta_d, float kP, float kD, float kI){
 
     double max = 100;
 
+    uint32_t startTime = pros::millis();
     while (count < 2){
+
+        if((pros::millis()-startTime > 3000)){
+            chassis->stop();
+            break;
+        }
         currentAngle = gyro2.get_heading();
 
         error = theta_d - currentAngle;
@@ -82,7 +88,15 @@ void pidTurnToPoint(point target, float kP, float kD, float kI, bool end){
 
     double max = 100;
 
+    uint32_t startTime = pros::millis();
+
     while (count < 2){
+
+        if((pros::millis()-startTime > 3000)){
+            chassis->stop();
+            break;
+        }
+
         currentAngle = gyro2.get_heading();
 
         error = theta_d - currentAngle;
@@ -157,8 +171,14 @@ void pidDrive(float distance, double angle, double speed, double kP_a){
 
     double motorL, motorR;
 
+    uint32_t startTime = pros::millis();
+
     while (count < 2){
 
+        if((pros::millis()-startTime > 5000)){
+            chassis->stop();
+            break;
+        }
         pos = {odom::y, odom::x};
         leftEnc = fabs((leftEncoder.get_value() - leftEnc_init) * DEGREES_TO_CM);
         rightEnc = fabs((rightEncoder.get_value() - rightEnc_init) * DEGREES_TO_CM);

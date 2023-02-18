@@ -167,8 +167,15 @@ void pp::runpp(std::vector<std::vector<double>> path, bool direction, float spee
     pp::linearVel = speed;
     point pos;
     pp::lookAheadPt = {path[0][0], path[0][1]};
+
+    uint32_t startTime = pros::millis();
     while (distanceToPoint(pos, {path[path.size()-1][0],path[path.size()-1][1]}) > 7)
     {
+
+        if((pros::millis()-startTime > 8000)){
+            chassis->stop();
+            break;
+        }
         //std::cout << path.size() << std::endl;
         std::pair<double, double> motorVel;
 

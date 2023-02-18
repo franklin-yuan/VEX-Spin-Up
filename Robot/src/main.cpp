@@ -1,8 +1,8 @@
 #include "main.h"
 
 
-bool skillsEnabled = true;
-bool testAuton = false;
+bool skillsEnabled = false;
+bool testAuton = true;
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -69,13 +69,20 @@ void autonomous() {
 				if(rollerDifficulty == 1){
 					teamL(false);
 				}
+                else if(Hard){
+                    carry(false);
+                }
                 else{
 					teamR(false);
 				}
 			}else{
 				if(rollerDifficulty == 1){
 					teamL(true);
-				}else{
+				}
+                else if(Hard){
+                    carry(true);
+                }
+                else{
 					teamR(true);
 				}
 			}
